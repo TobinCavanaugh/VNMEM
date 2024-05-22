@@ -55,10 +55,12 @@ public static class Program
     public static Dictionary<string, int> vars = new()
     {
         { "PC", 0 },
+        { "mem", 0 },
         { "X", 5 },
         { "Y", 2 },
         { "Z", 0 },
-        { "mem", 0 },
+        { "T0", 0 },
+        { "T1", 0 },
     };
 
     // private static Dictionary<string, Action<string>> commands = new()
@@ -172,8 +174,8 @@ public static class Program
             if (current.StartsWith("JMP"))
             {
                 var v = ParseHelpers.GetVar(current, "JMP").Realize();
-                vars["PC"] = v;
-                continue;
+                vars["PC"] = v - 1;
+                goto NextLine;
             }
 
             if (current.StartsWith("JMZ"))
