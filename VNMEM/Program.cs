@@ -1,13 +1,28 @@
-﻿namespace VNMEM;
+﻿using System.Text;
+
+namespace VNMEM;
 
 public static class Program
 {
-    public static bool running;
-
+    private static (int w, int h) window = new(0, 0);
 
     private static void DrawUI(string[] lines)
     {
-        Console.Clear();
+        var w = Console.WindowWidth - 3;
+        Console.SetCursorPosition(0, 0);
+
+        //Clear the console if the window has been resized
+        (int w, int h) size = (Console.WindowWidth, Console.WindowHeight);
+        if (size != window)
+        {
+            Console.Clear();
+            window = size;
+        }
+
+        //We padright everything in order to clear the full line as we print it.
+        //This is speed ideal (as microsoft is unable to clear a buffer in under half a second)
+        //but not memory ideal
+        StringBuilder display = new StringBuilder();
 
         for (int i = 0; i < lines.Length; i++)
         {
@@ -15,20 +30,25 @@ public static class Program
             var ls = i.ToString("".PadRight(lines.Length.ToString().Length, '0'));
             if (i == vars["PC"])
             {
-                Console.WriteLine($">{ls}.  {lines[i]}");
+                display.Append("> ");
             }
             else
             {
-                Console.WriteLine($" {ls}.  {lines[i]}");
+                display.Append(" ");
             }
+
+            display.AppendLine($"{ls}.  {lines[i]}".PadRight(w));
         }
 
-        Console.WriteLine("---");
+        display.AppendLine();
+        display.AppendLine("Registers:".PadRight(w));
 
         foreach (var v in vars)
         {
-            Console.WriteLine($"{v.Key}: {v.Value}");
+            display.AppendLine($"\t{v.Key}: {v.Value}".PadRight(w));
         }
+
+        Console.Write(display);
     }
 
 
@@ -43,55 +63,64 @@ public static class Program
 
     // private static Dictionary<string, Action<string>> commands = new()
     // {
-        // { "HLT", (_) => { running = false; } },
-        // { ""}
+    // { "HLT", (_) => { running = false; } },
+    // { ""}
     // }
+
 
     static void Main(string[] args)
     {
-        string program = @"//Our z is our output value
-LOD #1
-STO Z
+        Entry:
 
-//If our exponent is 0, the result is one
-LOD X 
-JMZ #25
+        if (args.Length == 0)
+        {
+            args = new string[] { "" };
+        }
 
+        string targetPath = args[0];
 
-//z *= y
-LOD Y
-MUL Z
-STO Z
+        string program = Resources.defaultProgram;
+        if (File.Exists(targetPath))
+        {
+            program = File.ReadAllText(targetPath);
+        }
+        else
+        {
+            Console.WriteLine(
+                $"Failed to load program... \"{targetPath}\" does not exist. Submit 'R' to try again, or press enter to load the default program.");
 
-//X -= 1, if x == 0 -> jump, else -> loop
-LOD X
-SUB #1
-STO X
-JMZ #22
-JMP #10
+            while (true)
+            {
+                string s = Console.ReadLine().ToLower().Replace(" ", "");
+                if (s == "r")
+                {
+                    goto Entry;
+                }
 
-//Regular program exit
-HLT //22
-
-//Exponent of 0 exit
-HLT
-";
+                if (s == "")
+                {
+                    break;
+                }
+            }
+        }
 
         program += "\n";
         program = program.Replace("\r\n", "\n");
 
         var lines = program.Split("\n");
 
-
         while (true)
         {
             DrawUI(lines);
             Console.ReadLine();
 
-
             var current = lines[vars["PC"]];
 
             current = current.Replace(" ", "");
+
+            //I considered making this more interesting via a dictionary of strings and actions but
+            //now that I think about it, thats stupid, slow, more memory consumption, less readable,
+            //less debuggable, more complex, uses more language features. REMEMBER: CLARITY != VERBOSITY
 
             if (current.StartsWith("#"))
             {
@@ -170,6 +199,8 @@ HLT
         }
 
         DrawUI(lines);
+
+        Console.WriteLine("PROGRAM ENDED");
 
         Console.WriteLine("Enter Y to exit");
 
