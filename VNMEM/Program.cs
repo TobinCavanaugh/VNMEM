@@ -46,7 +46,7 @@ public static class Program
 
         foreach (var v in vars)
         {
-            display.AppendLine($"\t{v.Key}: {v.Value}".PadRight(w));
+            display.AppendLine($"     {v.Key}: {v.Value}".PadRight(w));
         }
 
         Console.Write(display);
