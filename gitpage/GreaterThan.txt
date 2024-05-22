@@ -1,0 +1,33 @@
+//Z is (X = Y)
+//Load our default values
+LOD #5
+STO X
+
+LOD #5
+STO Y
+
+//Loop start
+LOD X
+SUB #1
+STO X
+JMZ #30 //If X has reached zero first, its <=
+
+
+LOD Y
+SUB #1
+STO Y
+JMZ #25 //If Y has reached zero first, its > 
+JMP #9
+//Loop end
+
+
+
+//TRUE
+LOD #1
+STO Z
+HLT
+
+//FALSE
+LOD #0
+STO Z
+HLT
