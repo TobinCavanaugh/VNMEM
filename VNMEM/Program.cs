@@ -24,10 +24,11 @@ public static class Program
         //but not memory ideal
         StringBuilder display = new StringBuilder();
 
+        var fmt = "".PadRight(lines.Length.ToString().Length, '0');
         for (int i = 0; i < lines.Length; i++)
         {
             //This is janky af but functional
-            var ls = i.ToString("".PadRight(lines.Length.ToString().Length, '0'));
+            var ls = (i + 1).ToString(fmt);
             if (i == vars["PC"])
             {
                 display.Append("> ");
@@ -174,7 +175,7 @@ public static class Program
             if (current.StartsWith("JMP"))
             {
                 var v = ParseHelpers.GetVar(current, "JMP").Realize();
-                vars["PC"] = v - 1;
+                vars["PC"] = v - 1 - 1;
                 goto NextLine;
             }
 
@@ -184,8 +185,7 @@ public static class Program
 
                 if (vars["mem"] == 0)
                 {
-                    vars["PC"] = v;
-                    continue;
+                    vars["PC"] = v - 1 - 1;
                 }
 
                 goto NextLine;

@@ -24,7 +24,7 @@ JMZ #22
 JMP #10
                                    
 //Regular program exit
-HLT //22
+HLT //23
                                    
 //Exponent of 0 exit
 HLT";
