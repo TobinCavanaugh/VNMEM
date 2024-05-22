@@ -1,4 +1,4 @@
-## A basic John Von Neumann machine
+## A basic John Von Neumann machine 
 
 I was reading up on Neumann recently and was very, very impressed by his thoughts. I figured I'd whip up an emulator of his concept for a computing machine in like 1945!!! Just crazy smart, his concepts on self replication were also way ahead of their time. I'll have to implement his statemachine at some point as well.
 
